@@ -180,7 +180,7 @@ def place_marker(game_list, xo_times_list):
         print(f"{player_list[0]} is {marker_list[0]}")
         print(f"{player_list[1]} is {marker_list[1]}")
         print(" ")
-        index_input = input(f"{player_times_list[player_index]}'s turn \nPlease choose a range of number from 1 to 9: ")
+        index_input = input(f"{player_times_list[player_index]}'s turn \nPlease choose a position number from 1 to 9: ")
         index = index_input.strip()
         print(" ")
         
