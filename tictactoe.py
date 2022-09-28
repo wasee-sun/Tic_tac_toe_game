@@ -1,35 +1,43 @@
 import random
 game_list = ["#", " ", " ", " ", " ", " ", " ", " ", " ", " "] # the list where user's input will be stored
 marker_list = [] # 2 values X and O, to determine which one is player 1 and player 2
-player_list = [] # 2 values determines player 1 and player2 according to marker list
+player_names = [] # 2 values determines player 1 and player2 according to marker list
+score_board = [0,0] # 2 values determines player 1 and player 2's score
+game_played = 0
 xo_times_list = [] # the list where the x and o values given by choose first function are stored, used with x_o index
 player_times_list = [] # the list where the player names given by the choose first function are stored
 index_list = [] # empty list where we will add all the position numbers user inputed
 index_list_full = [1,2,3,4,5,6,7,8,9] # list to check which position number is not in index list
-won_game = False
-player_index = 0  
-game_on = True
+won_game = False # to check if the game is won
+player_index = 0 # more on that below
+game_on = True # to check if the game is on
+game_continue = True # to check if the game is gonna continue from the memory or will it start fresh
 
-
+# displaying the game
 def display_game(game_list):
     
     # printing the board in a sequence with its format
-    print(f"Tic  tac  toe",end = "             |           ")
-    print("The board position numbers are like this: ")
+    print(f"  Tic  tac  toe",end = "           |          ")
+    print("Board positions",end = "         |        ")
+    print("Game stats")
     print(" ",end = "                         |           ")
+    print(" ",end = "                      |           ")
     print(" ")
     print(f"  {game_list[1]}  |  {game_list[2]}  |  {game_list[3]  }", end = "           |           ")
-    print("1  |  2  |  3")
+    print("1  |  2  |  3",end = "          |       ")
+    print(f"{player_names[0]}'s score: {score_board[0]}")
     print(f"-----------------",end = "         |           ")
     print("-------------")
     print(f"  {game_list[4]}  |  {game_list[5]}  |  {game_list[6]}  ",end = "         |           ")
-    print("4  |  5  |  6")
+    print("4  |  5  |  6",end = "          |       ")
+    print(f"{player_names[1]}'s score: {score_board[1]}")
     print(f"-----------------",end = "         |           ")
     print("-------------")
     print(f"  {game_list[7]}  |  {game_list[8]}  |  {game_list[9]}  ",end = "         |           ")
-    print("7  |  8  |  9")  
+    print("7  |  8  |  9",end = "          |       ")  
+    print(f"Games played: {game_played}")
     
-
+# displayng the game format
 def display_format():
     
     # displaying the format of playing the game
@@ -47,6 +55,38 @@ def display_format():
     print("If you want to stop the game at any certain point just write quit and the game will stop")
     print(" ")
 
+# users gives thier name
+def player_name():
+    
+    global game_on
+    global game_continue
+    player_list = ["Player 1", "Player 2"]
+    # User will give either the choice X or O which will be then implemented on the board
+    
+    for name in player_list:
+        # user gets the message to choose name
+        choice = "0"
+        while choice.isalpha() == False:
+            choice_input = input(f"{name} please choose your name: ")
+            choice = choice_input.strip()
+        
+            if choice.lower() == "quit":
+                game_on = False
+                game_continue = False
+                print("Game quitted")
+                return game_on, game_continue
+            if choice.isalpha() == False:
+                print("Numbers or special characters are not valid to be used in a name, please use alphabets only")     
+        player_names.append(choice)
+    
+    print(" ")
+    print(f"Player 1 is {player_names[0]}")
+    print(f"Player 2 is {player_names[1]}")
+    print(" ")
+    game_continue = True # this is only for the "F" function which helps to refresh memory of the game
+    return player_names 
+
+# choosing who is x or o
 def xory():
     
     global game_on
@@ -73,18 +113,16 @@ def xory():
     def appending(): 
         marker_list.append(choice) # appending user input to marker list
         print(" ")
-        print(f"Player 1 choose {choice}")
-        player_list.append("Player1") # appending user input to player list
+        print(f"{player_names[0]} choose {choice}")
         x_o.remove(choice) # removing the given user input to get the other value X or O form x_o
         marker_list.append(x_o[0]) # appending leftover to marker list
         print(" ")
-        print(f"Player 2 gets {x_o[0]}")
-        print(" ")  
-        player_list.append("Player2") # appending leftover to marker list
+        print(f"{player_names[1]} gets {x_o[0]}")
+        print(" ")
     
     appending()
         
-    return marker_list, player_list
+    return marker_list, player_names
 
 # randomly choosing who gets the first turn
 def choose_first():
@@ -98,7 +136,7 @@ def choose_first():
     def who_goes_first():
         while len(xo_times_list) < 9: # 9 places on board so we want 9 values
             # looping over the marker_list where x and o are stored
-            whole_list = [marker_list, player_list] # creating a second database where marker list and player list exists
+            whole_list = [marker_list, player_names] # creating a second database where marker list and player list exists
             # to append in the lists created above marker and player
             for index,value in enumerate(whole_list): 
                 each_list = whole_list[index] # taking a single list
@@ -117,19 +155,20 @@ def choose_first():
     # if even number player 1 goes firs                
     if random_num % 2 == 0:
         print(" ")
-        print("Player1 will go first")
+        print(f"{player_names[0]} will go first")
         who_goes_first()
     
     # for odd player 2 goes first            
     else:
         print(" ")
-        print("Player2 will go first")
+        print(f"{player_names[1]} will go first")
         marker_list.reverse()
-        player_list.reverse()
+        player_names.reverse()
         who_goes_first()
     
     return xo_times_list, player_times_list
 
+# function for checking if the space is empty where use has given input
 def space_check():
     
     used_str = "The positions used: " # the positions we already used
@@ -165,20 +204,22 @@ def space_check():
                 non_used_str += index + "," + " " 
     print(used_str)
     print(non_used_str)     
-        
+
+# placing the marker on board       
 def place_marker(game_list, xo_times_list):
     
     xo_index = 0 # this is the index of the x_o list we created above
     global player_index
     global game_on
+    global game_continue
     
     # cannot exceed more than 9 cause there are 9 houses in the board
     while len(index_list) < 9:
         
         # user gives a number as input
         print("  ")
-        print(f"{player_list[0]} is {marker_list[0]}")
-        print(f"{player_list[1]} is {marker_list[1]}")
+        print(f"{player_names[0]} is {marker_list[0]}")
+        print(f"{player_names[1]} is {marker_list[1]}")
         print(" ")
         index_input = input(f"{player_times_list[player_index]}'s turn \nPlease choose a position number from 1 to 9: ")
         index = index_input.strip()
@@ -186,8 +227,9 @@ def place_marker(game_list, xo_times_list):
         
         if index.lower() == "quit":
             game_on = False
+            game_continue = False
             print("Game quitted")
-            return game_on
+            return game_on, game_continue
         # if user gives a string or nothing then we throw an error at them and tell them to give the right one
         elif index.isdigit() == False:
             print("Sorry that's not a digit, enter a digit form 1 to 9")
@@ -197,7 +239,7 @@ def place_marker(game_list, xo_times_list):
             space_check() # check if the space is already occupied
         # if user gives something outside of 1 to 9
         elif int(index) not in range(1,10):
-            print("Sorry numb not in range, enter a digit form 1 to 9")
+            print("Sorry number not in range, enter a digit form 1 to 9")
         else:
             int_index = int(index) # turn it to an integer
             game_list[int_index] = xo_times_list[xo_index] # assign the marker choosen by user before to the given position
@@ -212,22 +254,45 @@ def place_marker(game_list, xo_times_list):
           
     return game_list
 
+# function to check if the user has won
 def win_check(game_list):
     
-    column_index = 1 # for columns
     global won_game
+    
+    def win_condition():
+        
+        global game_played
+        
+        for i in player_names:
+            if i == player_times_list[player_index]:
+                index = player_names.index(i)
+                score_board[index] += 1
+
+        # make the won game true essentially breaking the game
+        game_played += 1
+        
+        print(" ")
+        print(f"{player_times_list[player_index]} have won the game")
+        print(" ")
+        print(f"Games played: {game_played}")
+        print(f"{player_names[0]}'s score: {score_board[0]}")
+        print(f"{player_names[1]}'s score: {score_board[1]}")
+        
+        return game_played, score_board
+    
+    column_index = 1 # for columns
     
     # condition so that column index dont go above 3 (more on that on next comment)
     while column_index < 4:
+        
         # here checking if position 1, position 4 and position 7 has the same value, this is for the column check
         # if same value we let the player win and checks that no spaces left in the positions
         if (game_list[column_index] == game_list[column_index + 3] == game_list[column_index + 6]
             and " " not in [game_list[column_index], game_list[column_index + 3], game_list[column_index + 6]]):
-            print(" ")
-            print(f"{player_times_list[player_index]} have won the game")
-            # make the won game true essentially breaking the game
+            win_condition()
             won_game = True
             return won_game
+            
         # if no condition met we just keep adding 1 to go from positon 1 to 2 and at certain point to end the loop
         else:
             column_index += 1
@@ -240,11 +305,10 @@ def win_check(game_list):
         # if same value we let the player win and checks that no spaces left in the positions
         if (game_list[row_index] == game_list[row_index + 1] == game_list[row_index + 2]
             and " " not in [game_list[row_index], game_list[row_index + 1], game_list[row_index + 2]]):
-            print(" ")
-            print(f"{player_times_list[player_index]} have won the game")
-            # make the won game true essentially breaking the game
+            win_condition()
             won_game = True
             return won_game
+        
         # if no condition met we just keep adding 3 to go from positon 1 to 4 and at certain point to end the loop
         else:
             row_index += 3
@@ -260,11 +324,10 @@ def win_check(game_list):
             # if same value we let the player win and checks that no spaces left in the positions
             if (game_list[diagonal_index] == game_list[diagonal_index + 4] == game_list[diagonal_index + 8]
                 and " " not in [game_list[diagonal_index], game_list[diagonal_index + 4], game_list[diagonal_index + 8]]):
-                print(" ")
-                print(f"{player_times_list[player_index]} have won the game")
-                # make the won game true essentially breaking the game
+                win_condition()
                 won_game = True
                 return won_game
+                
             else:
                 diagonal_index += 2 #we go to the next diagonal
                 
@@ -274,9 +337,7 @@ def win_check(game_list):
             # if same value we let the player win and checks that no spaces left in the positions
             if (game_list[diagonal_index] == game_list[diagonal_index + 2] == game_list[diagonal_index + 4]
                 and " " not in [game_list[diagonal_index], game_list[diagonal_index + 2], game_list[diagonal_index + 4]]):
-                print(" ")
-                print(f"{player_times_list[player_index]} have won the game")
-                # make the won game true essentially breaking the game
+                win_condition()
                 won_game = True
                 return won_game
             else:
@@ -284,61 +345,94 @@ def win_check(game_list):
     
     else:
         full_board_check()     
-          
+
+# cheing if the board is full         
 def full_board_check():
+    
+    global game_played
     # checks if the board is full, if full it says the game is tie
     if len(index_list) == 9:
         print(" ")
         print("It's a tie")
-        return game_list
+        game_played += 1
+        print(" ")
+        print(f"Games played: {game_played}")
+        print(" ")
+        print(f"{player_names[0]}'s score: {score_board[0]}")
+        print(f"{player_names[1]}'s score: {score_board[1]}")
+        return game_list, game_played
     
+# function for replaying the game
 def replay():
     
     choice = "Wrong"
     # getting all the global variables
     global game_list
     global marker_list
-    global player_list
+    global player_names
     global xo_times_list
     global player_times_list
     global index_list
     global won_game
     global player_index
     global game_on
+    global game_continue
+    global score_board
+    global game_played
     
     if game_on == True:
         # telling user to choose Yes or No
-        while choice not in ["YES", "NO"]:
+        while choice not in ["YES", "NO", "F"]:
         
             print(" ")
-            choice_input = input("Game Over. Would you like to play another round (capital YES or NO): ")
+            # choice for either playing the same game or starting it fresh
+            choice_input = input("Game Over. Would you guys like to play another round (type capital YES or NO) \nOr would you guys want to start a fresh game (type capital F): ")
             choice = choice_input.strip()
-            # if user gives something else
-            if choice not in ["YES", "NO"]:
+            # if user gives something else 
+            if choice not in ["YES", "NO", "F"]:
                 print("I don't understand, please say capital YES or NO")
     
         # if user wants to continue reset everything   
-        if choice == "YES":
+        if choice == "F":
             print(" ")
-            print("Let's continue then")
+            print("Let's start fresh then")
             game_list = ["#", " ", " ", " ", " ", " ", " ", " ", " ", " "]
             marker_list = []
-            player_list = []
+            player_names = []
+            score_board = [0,0]
             xo_times_list = []
             player_times_list = []
             index_list = []
             won_game = False
             player_index = 0
             game_on = True
-            return game_on
+            game_continue = False 
+            # making it false so that the game don't continue on the same memory later made it true so that the next step runs
+            game_played = 0
+            return game_on, game_continue, game_played
+        elif choice == "YES":
+            print(" ")
+            print("Let's continue then")
+            print(" ")
+            game_list = ["#", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+            xo_times_list = []
+            player_times_list = []
+            index_list = []
+            won_game = False
+            player_index = 0
+            game_on = True
+            game_continue = True
+            return game_on, game_continue
     
         # otherwise just end the game
         else:
             print(" ")
-            print("Thanks for playing, hope to see you again")
+            print("Thanks for playing, hope to see you guys again")
             game_on = False
-            return game_on
-    
+            game_continue = False
+            return game_on, game_continue
+
+# main game    
 def tic_tac_toe():
     
     global game_on
@@ -347,9 +441,12 @@ def tic_tac_toe():
         
         display_format()
         
-        xory()
+        player_name()
         
-        if game_on == True: 
+        if game_on == True:
+            xory()
+        
+        while game_continue == True: 
             choose_first()
         
             place_marker(game_list, xo_times_list)
